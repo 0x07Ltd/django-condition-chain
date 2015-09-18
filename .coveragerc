@@ -1,0 +1,5 @@
+[report]
+omit =
+    */migrations/*
+    */south_migrations/*
+source = django_condition_chain
