@@ -9,6 +9,8 @@ from django_condition_chain.models import Condition, Chain, ChainElement
 
 
 return_arg = lambda x: x
+return_true = lambda: True
+return_false = lambda: False
 
 
 class ConditionTestCase(unittest.TestCase):
@@ -34,6 +36,87 @@ class ConditionTestCase(unittest.TestCase):
 
 
 class ChainTestCase(unittest.TestCase):
+
+    def test_call_one_condition(self):
+        """
+        Should evaluate whether all of the conditions passed based on their configurations.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true)
+        self.assertTrue(chain.call())
+
+    def test_call_two_conditions_true(self):
+        """
+        Should return True when two conditions both return True.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true)
+        G(ChainElement, chain=chain, condition=ret_true)
+        self.assertTrue(chain.call())
+
+    def test_call_two_conditions_true_and(self):
+        """
+        Should return True when two conditions both return True and they're linked with AND.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true, order=0)
+        G(ChainElement, chain=chain, condition=ret_true, order=1, joiner="and")
+        self.assertTrue(chain.call())
+
+    def test_call_two_conditions_true_or(self):
+        """
+        Should return True when two conditions both return True and they're linked with OR.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true, order=0)
+        G(ChainElement, chain=chain, condition=ret_true, order=1, joiner="or")
+        self.assertTrue(chain.call())
+
+    def test_call_one_condition_false(self):
+        """
+        Should return False when one condition is False.
+        """
+        ret_false = G(Condition, module="tests.test_conditions", function="return_false")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_false)
+        self.assertFalse(chain.call())
+
+    def test_call_two_conditions_one_false(self):
+        """
+        Should return False when one of two conditions are False.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        ret_false = G(Condition, module="tests.test_conditions", function="return_false")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true)
+        G(ChainElement, chain=chain, condition=ret_false)
+        self.assertFalse(chain.call())
+
+    def test_call_two_conditions_one_false_and(self):
+        """
+        Should return False when one of two conditions are False and they're linked with AND.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        ret_false = G(Condition, module="tests.test_conditions", function="return_false")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true, order=0)
+        G(ChainElement, chain=chain, condition=ret_false, order=1, joiner="and")
+        self.assertFalse(chain.call())
+
+    def test_call_two_conditions_one_false_or(self):
+        """
+        Should return True when one of two conditions are True and they're linked with OR.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        ret_false = G(Condition, module="tests.test_conditions", function="return_false")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_true, order=0)
+        G(ChainElement, chain=chain, condition=ret_false, order=1, joiner="or")
+        self.assertTrue(chain.call())
 
     def test_iter(self):
         """

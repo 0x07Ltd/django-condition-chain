@@ -2,7 +2,7 @@ from __future__ import unicode_literals
 from importlib import import_module
 
 from django.utils.encoding import python_2_unicode_compatible
-from django.db import models, transaction
+from django.db import models
 
 
 @python_2_unicode_compatible
