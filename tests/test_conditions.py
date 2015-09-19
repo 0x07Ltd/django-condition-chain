@@ -4,7 +4,6 @@ except ImportError:
     import django.utils.unittest as unittest
 
 from django_dynamic_fixture import G
-from django.db import IntegrityError
 
 from django_condition_chain.models import Condition, Chain, ChainElement
 
@@ -31,7 +30,82 @@ class ConditionTestCase(unittest.TestCase):
             Condition,
             module="tests.test_conditions",
             function="return_arg")
-        self.assertEqual(condition(return_value), return_value)
+        self.assertEqual(condition.call(return_value), return_value)
+
+
+class ChainTestCase(unittest.TestCase):
+
+    def test_iter(self):
+        """
+        Should return an iterator containing the ChainElements.
+        """
+        chain = G(Chain)
+        ces = (
+            G(ChainElement, chain=chain),
+            G(ChainElement, chain=chain),
+            G(ChainElement, chain=chain)
+        )
+        iterator = iter(chain)
+        for ce in ces:
+            self.assertEqual(next(iterator), ce)
+
+    def test_len(self):
+        """
+        Should return the amount of ChainElements in the chain.
+        """
+        amt = 10
+        chain = G(Chain)
+        for _ in range(amt):
+            G(ChainElement, chain=chain)
+        self.assertEqual(len(chain), amt)
+
+    def test_getitem(self):
+        """
+        Should return a specific ChainElement based on its order.
+        """
+        chain = G(Chain)
+        ces = (
+            G(ChainElement, chain=chain, order=0),
+            G(ChainElement, chain=chain, order=1),
+            G(ChainElement, chain=chain, order=2)
+        )
+        for i in range(len(ces)):
+            self.assertEqual(chain[i], ces[i])
+
+    def test_reversed(self):
+        """
+        Should return the ChainElements in reverse order.
+        """
+        chain = G(Chain)
+        ces = (
+            G(ChainElement, chain=chain, order=2),
+            G(ChainElement, chain=chain, order=1),
+            G(ChainElement, chain=chain, order=0)
+        )
+        for i, ce in enumerate(reversed(chain)):
+            self.assertEqual(ce, ces[i])
+
+    def test_elements_queryset(self):
+        """
+        Should return a queryset with only the Chain's ChainElements.
+        """
+        chain = G(Chain)
+        other_chain = G(Chain)
+        ces = (
+            G(ChainElement, chain=chain),
+            G(ChainElement, chain=chain),
+            G(ChainElement, chain=chain)
+        )
+        other_ces = (
+            G(ChainElement, chain=other_chain),
+            G(ChainElement, chain=other_chain),
+            G(ChainElement, chain=other_chain)
+        )
+        ret = list(chain.elements_queryset)
+        for ce in ces:
+            self.assertTrue(ce in ret)
+        for ce in other_ces:
+            self.assertTrue(ce not in ret)
 
 
 class ChainElementTestCase(unittest.TestCase):
@@ -41,15 +115,10 @@ class ChainElementTestCase(unittest.TestCase):
         Should return a string containing a description of the model.
         """
         cond_name = "Test Condition"
-        condition = Condition.objects.create(
-            name=cond_name,
-            module="tests.test_conditions",
-            function="return_arg"
-        )
-        chain = Chain.objects.create(name="Test Chain")
+        condition = G(Condition, name=cond_name)
         for joiner in ("AND", "OR"):
-            element = ChainElement.objects.create(
+            element = G(
+                ChainElement,
                 condition=condition,
-                joiner=joiner,
-                chain=chain)
+                joiner=joiner)
             self.assertEqual(element.__str__(), "%s Test Condition" % joiner)
