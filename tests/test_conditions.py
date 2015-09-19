@@ -87,14 +87,14 @@ class ChainTestCase(unittest.TestCase):
 
     def test_elements_queryset(self):
         """
-        Should return a queryset with only the Chain's ChainElements.
+        Should return a queryset with only the Chain's ChainElements in order.
         """
         chain = G(Chain)
         other_chain = G(Chain)
         ces = (
-            G(ChainElement, chain=chain),
-            G(ChainElement, chain=chain),
-            G(ChainElement, chain=chain)
+            G(ChainElement, chain=chain, order=1),
+            G(ChainElement, chain=chain, order=2),
+            G(ChainElement, chain=chain, order=3)
         )
         other_ces = (
             G(ChainElement, chain=other_chain),
@@ -102,8 +102,8 @@ class ChainTestCase(unittest.TestCase):
             G(ChainElement, chain=other_chain)
         )
         ret = list(chain.elements_queryset)
-        for ce in ces:
-            self.assertTrue(ce in ret)
+        for i, ce in enumerate(ces):
+            self.assertEqual(ce, ret[i])
         for ce in other_ces:
             self.assertTrue(ce not in ret)
 
