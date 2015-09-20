@@ -49,9 +49,6 @@ class Chain(models.Model):
     def __iter__(self):
         return iter(self.elements_queryset)
 
-    def __len__(self):
-        return self.elements_queryset.count()
-
     def __getitem__(self, key):
         return self.elements_queryset[key]
 

@@ -144,16 +144,6 @@ class ChainTestCase(unittest.TestCase):
         for ce in ces:
             self.assertEqual(next(iterator), ce)
 
-    def test_len(self):
-        """
-        Should return the amount of ChainElements in the chain.
-        """
-        amt = 10
-        chain = G(Chain)
-        for _ in range(amt):
-            G(ChainElement, chain=chain)
-        self.assertEqual(len(chain), amt)
-
     def test_getitem(self):
         """
         Should return a specific ChainElement based on its order.
