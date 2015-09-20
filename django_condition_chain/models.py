@@ -43,6 +43,8 @@ class Chain(models.Model):
         expression = "True"
         for element in self.elements_queryset:
             expression += " %s " % element.joiner.lower()
+            if element.negated:
+                expression += "not "
             expression += "%s" % bool(element.condition.call(*args, **kwargs))
         return eval(expression)
 
