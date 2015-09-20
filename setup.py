@@ -20,7 +20,7 @@ def required(fname):
 
 config = {
     "name": "django-condition-chain",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "namespace_packages": [],
     "packages": find_packages(exclude=["*.tests",
                                        "*.tests.*",
