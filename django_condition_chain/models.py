@@ -1,5 +1,6 @@
 from __future__ import unicode_literals
 from importlib import import_module
+import json
 
 from django.utils.encoding import python_2_unicode_compatible
 from django.db import models
@@ -18,6 +19,9 @@ class Condition(models.Model):
         max_length=64,
         help_text=("The function which returns True or False to determine the result of this "
                    "condition"))
+    custom_kwargs = models.TextField(
+        default="{}",
+        help_text="JSON representation of a dict to pass to the function as extra keyword args.")
 
     def __str__(self):
         return self.name
@@ -27,6 +31,7 @@ class Condition(models.Model):
         Imports and calls the condition function with the provided arguments and returns its
         response.
         """
+        kwargs.update(json.loads(self.custom_kwargs))
         return getattr(import_module(self.module), self.function)(*args, **kwargs)
 
 
