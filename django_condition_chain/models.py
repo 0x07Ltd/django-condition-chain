@@ -30,8 +30,12 @@ class Condition(models.Model):
         return getattr(import_module(self.module), self.function)(*args, **kwargs)
 
 
+@python_2_unicode_compatible
 class Chain(models.Model):
     name = models.CharField(max_length=128)
+
+    def __str__(self):
+        return self.name
 
     def call(self, *args, **kwargs):
         """
