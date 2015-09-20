@@ -38,7 +38,13 @@ class Chain(models.Model):
         Runs each condition and evaluates whether the entire condition chain has succeeded. Passes
         through any arguments provided to each Condition.
         """
-        pass
+        # Artificially set the first result to True to make our lives easier
+        # when joining the rest of the conditions together.
+        expression = "True"
+        for element in self.elements_queryset:
+            expression += " %s " % element.joiner.lower()
+            expression += "%s" % bool(element.condition.call(*args, **kwargs))
+        return eval(expression)
 
     def __iter__(self):
         return iter(self.elements_queryset)
