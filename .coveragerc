@@ -2,4 +2,6 @@
 omit =
     */migrations/*
     */south_migrations/*
+
+[run]
 source = django_condition_chain

@@ -118,6 +118,18 @@ class ChainTestCase(unittest.TestCase):
         G(ChainElement, chain=chain, condition=ret_false, order=1, joiner="or")
         self.assertTrue(chain.call())
 
+    def test_call_three_conditions_one_true_or(self):
+        """
+        Should return True when one of three conditions are True and they're linked with OR.
+        """
+        ret_true = G(Condition, module="tests.test_conditions", function="return_true")
+        ret_false = G(Condition, module="tests.test_conditions", function="return_false")
+        chain = G(Chain)
+        G(ChainElement, chain=chain, condition=ret_false, order=0)
+        G(ChainElement, chain=chain, condition=ret_false, order=1, joiner="or")
+        G(ChainElement, chain=chain, condition=ret_true, order=2, joiner="or")
+        self.assertTrue(chain.call())
+
     def test_iter(self):
         """
         Should return an iterator containing the ChainElements.

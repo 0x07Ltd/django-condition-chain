@@ -78,11 +78,11 @@ class Chain(models.Model):
 @python_2_unicode_compatible
 class ChainElement(models.Model):
     links = (
-        (u'AND', u'and'),
-        (u'OR', u'or')
+        (u'and', u'and'),
+        (u'or', u'or')
     )
     chain = models.ForeignKey(Chain)
-    joiner = models.CharField(choices=links, max_length=3, blank=True)
+    joiner = models.CharField(choices=links, max_length=3, default="and")
     negated = models.BooleanField(default=False)
     condition = models.ForeignKey(Condition)
     order = models.PositiveSmallIntegerField()
