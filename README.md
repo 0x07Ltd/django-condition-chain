@@ -10,8 +10,7 @@ Input:
 Front door opens
 
 Conditions:
-IF hallway movement sensor has not been triggered in the last ten seconds (somebody is coming *into* the house)
-AND outside light sensor is less than 20 (it's dark outside)
+IF outside light sensor is less than 20 (it's dark outside) AND hallway movement sensor has not been triggered in the last ten seconds (somebody is coming *into* the house)
 
 Output:
 Turn hallway lights on
