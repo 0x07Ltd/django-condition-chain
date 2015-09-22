@@ -22,10 +22,49 @@ required to create them.
 Usage
 -----
 
-Include `django_condition_chain` in your `INSTALLED_APPS`, then use the ConditionChain like so:
+Include `django_condition_chain` in your `INSTALLED_APPS`, then set up and use the conditions like so:
 
+Write your own conditions into your project, optionally taking extra arguments which you can either pass in during run-time (eg. `house`) or specify in the configuration stage (eg. `seconds`).
+`yourproject/conditions.py`
 ```python
-# @TODO: Write an example
+def is_dark_outside(house):
+    return house.ext_light_sensor < 20
+
+def hallway_movement_in_last_x_secs(house, seconds):
+    return (datetime.now() - house.hallway.last_movement) < timedelta(seconds=seconds)
+```
+
+Set up the conditions and chain. This could also be done using the admin interface.
+```python
+from django_condition_chain.models import Condition, Chain, ChainElement
+is_dark = Condition.objects.create(
+    name="is dark outside",
+    module="yourproject.conditions",
+    function="is_dark_outside")
+hallway_movement = Condition.objects.create(
+    name="hallway movement in last 10 secs",
+    module="yourproject.conditions",
+    function="hallway_movement_in_last_x_secs",
+    custom_kwargs='{"seconds": 10}')
+chain = Chain.objects.create(name="Is dark and person coming in front door")
+ChainElement.objects.create(
+    chain=chain,
+    condition=is_dark,
+    order=0)
+ChainElement.objects.create(
+    chain=chain,
+    condition=hallway_movement,
+    joiner="and",
+    order=1)
+```
+
+When the front door opens, use the condition chain to see if you should turn the lights on.
+```python
+from django_condition_chain.models import Chain
+def on_front_door_open(house)
+    condition_chain = Chain.objects.get(name="Is dark and person coming in front door")
+    if condition_chain.run(house):
+        house.hallway.lights.on()
 ```
 
 Usage with South
