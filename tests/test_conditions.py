@@ -37,6 +37,14 @@ class ConditionTestCase(unittest.TestCase):
 
 class ChainTestCase(unittest.TestCase):
 
+    def test_str(self):
+        """
+        Should simply return the name of the Chain
+        """
+        name = "The name of the chain"
+        chain = G(Chain, name=name)
+        self.assertEqual(chain.__str__(), name)
+
     def test_call_one_condition(self):
         """
         Should evaluate whether all of the conditions passed based on their configurations.
